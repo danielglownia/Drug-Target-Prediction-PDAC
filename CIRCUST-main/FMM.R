@@ -1,22 +1,23 @@
-# Funcón para representar de forma sencilla un FMM
-# Recibe como argumentos:
-#  - M --> Valor para M
-#  - A --> valor  para A
-#  - a --> valor para alpha
-#  - b --> valor para beta
-#  - w --> valor para omega
-#  - from --> instante temporal de inicio. Por defecto es 0.
-#  - to --> instante temporal de fin Por defecto es 2*pi.
-#  - timePoints --> También es posible definir unos instantes de tiempo prefijados
-#  - plot --> en caso afirmativo, se dispondrá por la salida de gráficos estándar de una
-#             representación gráfica del FMM
-#  - outvalues --> en caso afirmativo, se devolverá una lista con los instantes temporales 
-#                  y los valores producidos.
-#  - length.out --> longitud de la simulación
-#  - sigmaNoise --> en caso afirmativo, se añade un ruido normal con s.d. especificada.
-# En lugar de establecer valores individuales para M, A, alpha, beta y omega,
-# se puede establecer un array. En este caso se genera una combinación lineal de FMMs.
-# Se añaden los que faltan por replicación
+# Funcon to simply represent an FMM
+# Receives as arguments:
+# - M --> Value for M
+# - A --> value for A
+# - a --> value for alpha
+# - b --> value for beta
+# - w --> value for omega
+# - from --> starting time. By default it is 0.
+# - to --> end time instant By default it is 2*pi.
+# - timePoints --> It is also possible to define preset moments of time
+# - plot --> if yes, it will be available through the standard graphics output of a
+# graphical representation of the FMM
+# - outvalues ​​--> if yes, a list with the time instants will be returned
+# and the values ​​produced.
+# - length.out --> simulation length
+# - sigmaNoise --> if yes, normal noise is added with s.d. specified.
+# Instead of setting individual values ​​for M, A, alpha, beta, and omega,
+# an array can be established. In this case a linear combination of FMMs is generated.
+# The missing ones are added due to replication
+
 FMM <- function(M,A,a,b,w,from=0,to=2*pi,length.out=100,timePoints=seq(from,to,length=length.out),
                 plot=T,outvalues=F,sigmaNoise=0){
   
@@ -57,31 +58,30 @@ predict_FMM <- function(M,A,alpha,beta,omega,timePoints){
   return(FMM(M,a,alpha,beta,omega,timePoints = timePoints,plot=F,outvalues = T)$y)
 }
 
-
-# Función para ajustar un modelo FMM sobre unos datos.
-# Recibe como entrada los datos y los instantes de tiempo donde se observan:
-#  vData --> valores para el ajuste
-#  timePoints --> instantes de tiempo en el que se produce el ajuste.
-#                  Por defecto están equiespaciados
-#  lengthAlphaGrid --> Longitud del GRID utilizado para alpha. Debe indicarse con un número entero.
-#                     No es necesario indicarlo si se va a utilizar un GRID personalizado mediante
-#                     el argumento alphaGrid. Por defecto vale 24.
-#  lengthOmegaGrid --> Longitud del GRID utilizado para omega Debe indicarse con un número entero.
-#                     No es necesario indicarlo si se va a utilizar un GRID personalizado mediante
-#                     el argumento omegaGrid. Por defecto vale 24.
-#  alphaGrid --> Valores de alpha utilizados para la estimación inicial
-#                Si se conoce el valor aproximado de alpha, es recomendable indicarlo aquí
-#                Por defecto, equiespaciados entre 0 y 2pi, utilizando 24 elementos
-#  omegaMax --> valor máximo que puede tomar el parámetro omega. En ningún caso se devuelve
-#               un omega estimado mayor del especificado.
-#               Si se conoce el valor aproximado de omega, es recomendable indicar aquí una cota
-#  omegaGrid --> Valores de omega utilizados para la estimación inicial
-#                Por defecto toma valores entre 0.0001 y 1 en escala logarítmica
-#  numReps --> número de veces que se repite el paso 1 + 2. La salida del paso 2 se toma como una nueva entrada
-#              en torno a la que construir un nuevo GRID. Se repite la estimación un total de numReps.
-#              Por defecto vale 3, es decir, se hace tres veces.
-# REESCRITA CON RESPECTO A LA ORIGINAL
-# PROBABLEMENTE HAYA QUE CAMBIARLE EL NOMBRE
+# Function to fit an FMM model on data.
+# Receives as input the data and the moments of time where they are observed:
+# vData --> values ​​for tuning
+# timePoints --> instants of time in which the adjustment occurs.
+# By default they are equally spaced
+# lengthAlphaGrid --> Length of the GRID used for alpha. It must be indicated with an integer.
+# It is not necessary to indicate this if a custom GRID is to be used through
+# the alphaGrid argument. By default it is 24.
+# lengthOmegaGrid --> Length of the GRID used for omega Must be indicated with an integer.
+# It is not necessary to indicate this if a custom GRID is to be used through
+# the omegaGrid argument. By default it is 24.
+# alphaGrid --> Alpha values ​​used for initial estimation
+# If the approximate value of alpha is known, it is advisable to indicate it here
+# By default, equally spaced between 0 and 2pi, using 24 elements
+# omegaMax --> maximum value that the omega parameter can take. In no case is it returned
+# an estimated omega greater than specified.
+# If the approximate value of omega is known, it is advisable to indicate a dimension here
+# omegaGrid --> Omega values ​​used for initial estimation
+# By default it takes values ​​between 0.0001 and 1 on a logarithmic scale
+# numReps --> number of times step 1 + 2 is repeated. The output of step 2 is taken as a new input
+# around which to build a new GRID. The estimation is repeated for a total of numReps.
+# By default it is 3, that is, it is done three times.
+# REWRITTEN WITH RESPECT TO THE ORIGINAL
+# PROBABLY NEEDS TO CHANGE THE NAME
 fitFMM_Par<-function(vData, timePoints = seq(0,2*pi,length.out = length(vData)),
                      lengthAlphaGrid = 48, lengthOmegaGrid = 24,
                      alphaGrid = seq(0,2*pi,length.out = lengthAlphaGrid), omegaMax = 1,
@@ -89,32 +89,33 @@ fitFMM_Par<-function(vData, timePoints = seq(0,2*pi,length.out = length(vData)),
                      numReps = 3){
   
   n <- length(vData)
-  
-  ## Step 1: Calcular los estimadores iniciales de M, A, alpha, beta y omega
-  #Para ello se fija alpha y omega y se calculan los demás utilizando un modelo Cosinor
+
+  ## Step 1: Calculate the initial estimators of M, A, alpha, beta and omega
+  #To do this, alpha and omega are set and the others are calculated using a Cosinor model
   grid <- expand.grid(alphaGrid,omegaGrid)
   
-  #Para evitar un doble bucle, ineficientes en R, se utiliza la función apply con una función auxiliar
-  #Esta función auxiliar se encarga de la estimación de beta, M, A, y también devuelve como añadido el RSS
-  #para facilitar la búsqueda del mejor a posteriori
+  #To avoid an inefficient double loop in R, the apply function is used with a helper function
+  #This auxiliary function is responsible for estimating beta, M, A, and also returns the RSS as an aggregate
+  #to facilitate the search for the best one after the fact
+    
   step1 <- t(apply(grid,1,step1FMM, vData=vData, timePoints=timePoints))
   colnames(step1) <- c("M","A","alpha","beta","omega","RSS")
   
-  #De todos los ajustados, buscamos el que tiene un menor RSS pero que cumpla ciertas
-  #condiciones de estabilidad. Para esto se usa la función bestStep1.
+  #Of all the adjusted ones, we look for the one that has a lower RSS but that meets certain
+  #stability conditions. For this the bestStep1 function is used.
   bestPar <- bestStep1(vData,step1)
-  #Los estimadores iniciales para M, A, alpha, beta y omega ya se han encontrado
+  #The initial estimators for M, A, alpha, beta and omega have already been found
   
-  #Step-2: Optimización de Nelder-Mead para el RSS
+  #Step-2: Nelder-Mead Optimization for RSS
   nelderMead <- optim(par = bestPar[1:5], fn = step2FMM, vData = vData, timePoints = timePoints, omegaMax = omegaMax)
   parFinal <- nelderMead$par
   SSE <- nelderMead$value*n
   
-  #Llevar alpha y beta al intervalo [0,2pi]
+  #Take alpha and beta to the interval [0.2pi]
   parFinal[3] <- parFinal[3]%%(2*pi)
   parFinal[4] <- parFinal[4]%%(2*pi)
   
-  #Se repite el GRID el número de veces especificado (por defecto NO se aplica esta opción)
+  #The GRID is repeated the specified number of times (by default this option is NOT applied)
   numReps <- numReps - 1
   while(numReps > 0){
     
