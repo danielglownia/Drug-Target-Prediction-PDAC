@@ -119,13 +119,13 @@ fitFMM_Par<-function(vData, timePoints = seq(0,2*pi,length.out = length(vData)),
   numReps <- numReps - 1
   while(numReps > 0){
     
-    #Nuevo GRID para alpha, de la misma longitud del anterior. Se asegura que esté entre 0 y 2pi.
+    #New GRID for alpha, the same length as the previous one. It is ensured that it is between 0 and 2pi.
     nAlphaGrid <- length(alphaGrid)
     amplitudeAlphaGrid <- 1.5*mean(diff(alphaGrid))
     alphaGrid <- seq(parFinal[3]-amplitudeAlphaGrid,parFinal[3]+amplitudeAlphaGrid,length.out = nAlphaGrid)
     alphaGrid <- alphaGrid%%(2*pi)
     
-    #Nuevo GRID para omega, de la misma longitud del anterior. Se asegura que esté entre 0 y omegaMax
+    #New GRID for omega, the same length as the previous one. It is ensured that it is between 0 and omegaMax
     nOmegaGrid <- length(omegaGrid)
     amplitudeOmegaGrid <- 1.5*mean(diff(omegaGrid))
     omegaGrid <- seq(max(parFinal[5]-amplitudeOmegaGrid,0),
@@ -140,7 +140,7 @@ fitFMM_Par<-function(vData, timePoints = seq(0,2*pi,length.out = length(vData)),
     antBestPar <- bestPar
     bestPar <- bestStep1(vData,step1)
     
-    #Es posible que no haya ninguno que satisfaga las condiciones
+    #There may not be any that satisfy the conditions
     if(is.null(bestPar)){
       bestPar <- antBestPar
       numReps <- 0
@@ -152,7 +152,7 @@ fitFMM_Par<-function(vData, timePoints = seq(0,2*pi,length.out = length(vData)),
     nelderMead <- optim(par = bestPar[1:5], fn = step2FMM, vData = vData, timePoints = timePoints, omegaMax = omegaMax)
     parFinal <- nelderMead$par
     
-    #Llevar alpha y beta al intervalo [0,2pi]
+    #Take alpha and beta to the interval [0.2pi]
     parFinal[3] <- parFinal[3]%%(2*pi)
     parFinal[4] <- parFinal[4]%%(2*pi)
     
@@ -162,8 +162,9 @@ fitFMM_Par<-function(vData, timePoints = seq(0,2*pi,length.out = length(vData)),
   
   names(parFinal) <- c("M","A","alpha","beta","omega")
   
-  #Devuelve, además de los parámetros, un ajuste en los intervalos de tiempo especificados 
-  #y el SSE (sum squared error).
+  #Returns, in addition to the parameters, an adjustment at the specified time intervals
+  #and the SSE (sum squared error).
+    
   adjMob <- parFinal["M"] + parFinal["A"]*cos(parFinal["beta"] + 2*atan(parFinal["omega"]*tan((timePoints-parFinal["alpha"])/2)))
   SSE <- sum((adjMob-vData)^2)
   
@@ -174,41 +175,42 @@ fitFMM_Par<-function(vData, timePoints = seq(0,2*pi,length.out = length(vData)),
 
 
 
-# Función para ajustar un modelo FMM múltiple (backfitting) sobre unos datos.
-# Recibe como entrada los datos y los instantes de tiempo donde se observan:
-#  vData --> valores para el ajuste
-#  timePoints --> instantes de tiempo en el que se produce el ajuste.
-#                  Por defecto están equiespaciados
-#  nback --> número de componentes a ajustar mediante backfitting
-#  maxiter --> número máximo de iteraciones a realizar. Por defecto vale lo mismo que nback.
-#  stopFunction --> parámetro opcional. Debe especificarse una función que recibe tres argumentos:
-#                   los valores reales (vData), el valor ajustado por el FMM en la iteración actual,
-#                   y el valor ajustado por el FMM en la anterior iteración. Debe devolver TRUE si se desea
-#                   detener el backfitting, o FALSE si debe continuar porque aún no se ha alcanzado la convergencia.
-#                   Por defecto siempre devuelve FALSE: stopFunction = function(vData,pred,prevPred){return(FALSE)}
-#  objectFMM --> un objeto FMM, como máximo de nback componentes, sobre el que continuar realizando iteraciones.
-#                Esta opción permite continuar un ajuste a partir de un objetoFMM anterior
-#                ahorrando en tiempo y recursos al no comenzar desde el principio.
-#                Si el número de componentes no es el mismo, los demás parámetros se rellenan con cero.
-#  lengthAlphaGrid --> Longitud del GRID utilizado para alpha. Debe indicarse con un número entero.
-#                     No es necesario indicarlo si se va a utilizar un GRID personalizado mediante
-#                     el argumento alphaGrid. Por defecto vale 24.
-#  lengthOmegaGrid --> Longitud del GRID utilizado para omega Debe indicarse con un número entero.
-#                     No es necesario indicarlo si se va a utilizar un GRID personalizado mediante
-#                     el argumento omegaGrid. Por defecto vale 24.
-#  alphaGrid --> Valores de alpha utilizados para la estimación inicial
-#                Si se conoce el valor aproximado de alpha, es recomendable indicarlo aquí
-#                Por defecto, equiespaciados entre 0 y 2pi, utilizando 24 elementos
-#  omegaMax --> valor máximo que puede tomar el parámetro omega. En ningún caso se devuelve
-#               un omega estimado mayor del especificado.
-#               Si se conoce el valor aproximado de omega, es recomendable indicar aquí una cota
-#  omegaGrid --> Valores de omega utilizados para la estimación inicial
-#                Por defecto toma valores entre 0.0001 y 1 en escala logarítmica
-#  numReps --> número de veces que se repite el paso 1 + 2. La salida del paso 2 se toma como una nueva entrada
-#              en torno a la que construir un nuevo GRID. Se repite la estimación un total de numReps.
-#              Por defecto vale 3, es decir, se hace tres veces.
-# REESCRITA CON RESPECTO A LA ORIGINAL
-# PROBABLEMENTE HAYA QUE CAMBIARLE EL NOMBRE
+# Function to fit a multiple FMM model (backfitting) on ​​data.
+# Receives as input the data and the moments of time where they are observed:
+# vData --> values ​​for tuning
+# timePoints --> instants of time in which the adjustment occurs.
+# By default they are equally spaced
+# nback --> number of components to be adjusted by backfitting
+# maxiter --> maximum number of iterations to perform. By default it is the same as nback.
+# stopFunction --> optional parameter. You must specify a function that takes three arguments:
+# the actual values ​​(vData), the value adjusted by the FMM in the current iteration,
+# and the value adjusted by the FMM in the previous iteration. Should return TRUE if desired
+# stop backfitting, or FALSE if it should continue because convergence has not yet been reached.
+# By default it always returns FALSE: stopFunction = function(vData,pred,prevPred){return(FALSE)}
+# objectFMM --> an FMM object, with at most nback components, to continue iterating over.
+# This option allows you to continue a setting from a previous FMM object
+# saving time and resources by not starting from the beginning.
+# If the number of components is not the same, the other parameters are padded with zero.
+# lengthAlphaGrid --> Length of the GRID used for alpha. It must be indicated with an integer.
+# It is not necessary to indicate this if a custom GRID is to be used through
+# the alphaGrid argument. By default it is 24.
+# lengthOmegaGrid --> Length of the GRID used for omega Must be indicated with an integer.
+# It is not necessary to indicate this if a custom GRID is to be used through
+# the omegaGrid argument. By default it is 24.
+# alphaGrid --> Alpha values ​​used for initial estimation
+# If the approximate value of alpha is known, it is advisable to indicate it here
+# By default, equally spaced between 0 and 2pi, using 24 elements
+# omegaMax --> maximum value that the omega parameter can take. In no case is it returned
+# an estimated omega greater than specified.
+# If the approximate value of omega is known, it is advisable to indicate a dimension here
+# omegaGrid --> Omega values ​​used for initial estimation
+# By default it takes values ​​between 0.0001 and 1 on a logarithmic scale
+# numReps --> number of times step 1 + 2 is repeated. The output of step 2 is taken as a new input
+# around which to build a new GRID. The estimation is repeated for a total of numReps.
+# By default it is 3, that is, it is done three times.
+# REWRITTEN WITH RESPECT TO THE ORIGINAL
+# PROBABLY NEEDS TO CHANGE THE NAME
+
 fitFMM_back<-function(vData, timePoints = seq(0,2*pi,length.out = length(vData)), nback, maxiter=nback,
                       stopFunction = function(vData,pred,prevPred){return(FALSE)}, objectFMM = NULL,
                      lengthAlphaGrid = 48, lengthOmegaGrid = 24,
@@ -228,7 +230,7 @@ fitFMM_back<-function(vData, timePoints = seq(0,2*pi,length.out = length(vData))
     porcentajeCompletado <- 0.00001
   }
   
-  #Inicialización de las estructuras para almacenar las componentes.
+  #Initialization of structures to store components.
   predichosComponente <- list()
   ajusteComponente <- list()
   
@@ -239,7 +241,7 @@ fitFMM_back<-function(vData, timePoints = seq(0,2*pi,length.out = length(vData))
     }
     prevAdjMob <- NULL
     
-  #En caso de que se aporte un objectFMM anterior para seguir con el ajuste
+  #In case of starting from the beginning (an objectFMM is not provided)
   } else {
     prevAdjMob <- objectFMM$FMM
     nbackAnterior <- length(objectFMM$alpha)
@@ -257,7 +259,7 @@ fitFMM_back<-function(vData, timePoints = seq(0,2*pi,length.out = length(vData))
   }
   
   
-  #Backfitting hasta un máximo de maxiter
+  #Backfitting up to a maximum of maxiter
   for(i in 1:maxiter){
     
     #Backfitting por componentes
