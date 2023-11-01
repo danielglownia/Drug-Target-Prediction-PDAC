@@ -10,7 +10,7 @@ source("functionGTEX_cores.R")
 ##############################################################
 
 # Load data example: Tissue-specific gene expression data from GTEx (dowloaded from:)
-load(matrixIn.RData) # Provided in this GitHub
+load("matrixIn.RData") # Provided in this GitHub
 
 # Expression matrix
 inputExample<-matrixIn 
