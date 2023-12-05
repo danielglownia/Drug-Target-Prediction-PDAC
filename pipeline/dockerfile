@@ -1,8 +1,8 @@
-FROM mcr.microsoft.com/windows/servercore:ltsc2019
-
-WORKDIR /app
+FROM python:3.9-windowsservercore
 
 COPY . .
+
+WORKDIR /pipeline
 
 RUN pip install -r req.txt
 
