@@ -2,7 +2,7 @@ from modules import data
 
 print("1. Data Retrieval:")
 
-df = data.download_and_read_data('https://gdc-hub.s3.us-east-1.amazonaws.com/download/TCGA-PAAD.gistic.tsv.gz')
+df = data.download_expression_data('https://gdc-hub.s3.us-east-1.amazonaws.com/download/TCGA-PAAD.gistic.tsv.gz')
 
 print(df.head())
 
