@@ -3,7 +3,7 @@ import gzip
 import pandas as pd
 from io import BytesIO
 
-def download_and_read_data(url):
+def download_expression_data(url):
     # Step 1: Download the file
     response = requests.get(url)
     
