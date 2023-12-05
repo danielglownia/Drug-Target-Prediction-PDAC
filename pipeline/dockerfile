@@ -1,9 +1,0 @@
-FROM python:3.9-windowsservercore
-
-COPY . .
-
-WORKDIR /pipeline
-
-RUN pip install -r req.txt
-
-CMD ["python", "app.py"]
