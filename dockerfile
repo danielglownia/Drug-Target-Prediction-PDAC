@@ -8,8 +8,8 @@ WORKDIR /app
 COPY /* /app/
 
 # Install any needed packages specified in requirements.txt
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r req.txt
+RUN pip install --upgrade pip --user
+RUN pip install --no-cache-dir -r req.txt --user
 
 # Install R in the Docker image using PowerShell
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
